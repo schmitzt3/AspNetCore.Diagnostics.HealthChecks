@@ -123,5 +123,41 @@ namespace UnitTests.HealthChecks.DependencyInjection.CosmosDb
             registration.Name.Should().Be("my-azuretable-group");
             check.GetType().Should().Be(typeof(TableServiceHealthCheck));
         }
+        [Fact]
+        public void add_cosmosdb_health_check_when_properly_configured_with_client_options()
+        {
+            var services = new ServiceCollection();
+            services.AddHealthChecks()
+                .AddCosmosDb("myconnectionstring", new CosmosClientOptions {
+                  ConnectionMode = ConnectionMode.Gateway
+                });
+
+            var serviceProvider = services.BuildServiceProvider();
+            var options = serviceProvider.GetService<IOptions<HealthCheckServiceOptions>>();
+
+            var registration = options.Value.Registrations.First();
+            var check = registration.Factory(serviceProvider);
+
+            registration.Name.Should().Be("cosmosdb");
+            check.GetType().Should().Be(typeof(CosmosDbHealthCheck));
+        }
+        [Fact]
+        public void add_cosmosdb_health_check_when_properly_configured_with_database_and_client_options()
+        {
+            var services = new ServiceCollection();
+            services.AddHealthChecks()
+                .AddCosmosDb("myconnectionstring", "dabasename", new CosmosClientOptions {
+                  ConnectionMode = ConnectionMode.Gateway
+                });
+
+            var serviceProvider = services.BuildServiceProvider();
+            var options = serviceProvider.GetService<IOptions<HealthCheckServiceOptions>>();
+
+            var registration = options.Value.Registrations.First();
+            var check = registration.Factory(serviceProvider);
+
+            registration.Name.Should().Be("cosmosdb");
+            check.GetType().Should().Be(typeof(CosmosDbHealthCheck));
+        }
     }
 }

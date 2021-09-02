@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using HealthChecks.CosmosDb;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </param>
         /// <param name="tags">A list of tags that can be used to filter sets of health checks. Optional.</param>
         /// <param name="timeout">An optional System.TimeSpan representing the timeout of the check.</param>
+        /// <param name="cosmosClientOptions">An optional Microsoft.Azure.Cosmos.CosmosClientOptions representing client configuration options.</param>
         /// <returns>The <see cref="IHealthChecksBuilder"/>.</returns>
         public static IHealthChecksBuilder AddCosmosDb(
             this IHealthChecksBuilder builder,
@@ -33,11 +35,12 @@ namespace Microsoft.Extensions.DependencyInjection
             string name = default,
             HealthStatus? failureStatus = default,
             IEnumerable<string> tags = default,
-            TimeSpan? timeout = default)
+            TimeSpan? timeout = default,
+            CosmosClientOptions cosmosClientOptions = default)
         {
             return builder.Add(new HealthCheckRegistration(
                name ?? COSMOS_NAME,
-               sp => new CosmosDbHealthCheck(connectionString, database, Enumerable.Empty<string>()),
+               sp => new CosmosDbHealthCheck(connectionString, database, Enumerable.Empty<string>(), cosmosClientOptions),
                failureStatus,
                tags,
                timeout));
@@ -58,6 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </param>
         /// <param name="tags">A list of tags that can be used to filter sets of health checks. Optional.</param>
         /// <param name="timeout">An optional System.TimeSpan representing the timeout of the check.</param>
+        /// <param name="cosmosClientOptions">An optional Microsoft.Azure.Cosmos.CosmosClientOptions representing client configuration options.</param>
         /// <returns>The <see cref="IHealthChecksBuilder"/>.</returns>
         public static IHealthChecksBuilder AddCosmosDbCollection(
             this IHealthChecksBuilder builder,
@@ -67,11 +71,12 @@ namespace Microsoft.Extensions.DependencyInjection
             string name = default,
             HealthStatus? failureStatus = default,
             IEnumerable<string> tags = default,
-            TimeSpan? timeout = default)
+            TimeSpan? timeout = default,
+            CosmosClientOptions cosmosClientOptions = default)
         {
             return builder.Add(new HealthCheckRegistration(
                name ?? COSMOS_NAME,
-               sp => new CosmosDbHealthCheck(connectionString, database, collections),
+               sp => new CosmosDbHealthCheck(connectionString, database, collections, cosmosClientOptions),
                failureStatus,
                tags,
                timeout));
